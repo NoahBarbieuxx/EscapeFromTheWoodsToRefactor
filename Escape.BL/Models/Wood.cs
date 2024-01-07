@@ -119,96 +119,13 @@ namespace Escape.BL.Models
             while (true);
         }
 
-        //public List<Tree> EscapeMonkey(Monkey monkey)
-        //{
-        //    Console.ForegroundColor = ConsoleColor.White;
-        //    Console.WriteLine($"{WoodID}: Start {WoodID}, {monkey.Name}");
-
-        //    Dictionary<int, bool> visited = Trees.ToDictionary(x => x.TreeID, x => false);
-
-        //    List<Tree> route = new List<Tree> { monkey.Tree };
-        //    do
-        //    {
-        //        visited[monkey.Tree.TreeID] = true;
-
-        //        // Gebruik de FindNearestTree-methode om de dichtstbijzijnde bomen te vinden
-        //        List<Tree> nearestTrees = FindNearestTree(monkey.Tree.X, monkey.Tree.Y, 5);
-
-        //        double distanceToBorder = new List<double>
-        //        {
-        //            Map.Ymax - monkey.Tree.Y,
-        //            Map.Xmax - monkey.Tree.X,
-        //            monkey.Tree.Y - Map.Ymin,
-        //            monkey.Tree.X - Map.Xmin
-        //        }.Min();
-
-        //        if (nearestTrees == null || !nearestTrees.Any() || distanceToBorder < CalculateDistance(monkey.Tree, nearestTrees.First())) // Aangepaste voorwaarde, je kunt hier een geschikte drempelwaarde instellen
-        //        {
-        //            WriteRouteToDB(monkey, route);
-
-        //            Console.ForegroundColor = ConsoleColor.White;
-        //            Console.WriteLine($"{WoodID}: End {WoodID}, {monkey.Name}");
-
-        //            return route;
-        //        }
-
-        //        Tree nearestTree = nearestTrees.First(); // Kies de eerste boom uit de lijst (je kunt de logica hier aanpassen indien nodig)
-        //        route.Add(nearestTree);
-        //        monkey.Tree = nearestTree;
-        //    }
-        //    while (true);
-        //}
-
-        //public List<Tree> EscapeMonkey(Monkey monkey)
-        //{
-        //    Console.ForegroundColor = ConsoleColor.White;
-        //    Console.WriteLine($"{WoodID}: Start {WoodID}, {monkey.Name}");
-
-        //    Dictionary<int, bool> visited = Trees.ToDictionary(x => x.TreeID, x => false);
-
-        //    List<Tree> route = new List<Tree> { monkey.Tree };
-        //    do
-        //    {
-        //        visited[monkey.Tree.TreeID] = true;
-
-        //        int monkeyX = monkey.Tree.X;
-        //        int monkeyY = monkey.Tree.Y;
-
-        //        List<Tree> nearestTrees = FindNearestTree(monkeyX, monkeyY, 10);
-        //        Tree firstTree = nearestTrees.First();
-
-        //        double distanceToBorder = new List<double>
-        //        {
-        //            Map.Ymax - monkey.Tree.Y,
-        //            Map.Xmax - monkey.Tree.X,
-        //            monkey.Tree.Y - Map.Ymin,
-        //            monkey.Tree.X - Map.Xmin
-        //        }.Min();
-
-        //        if (nearestTrees.Count == 0 || distanceToBorder < CalculateDistance(monkey.Tree, firstTree))
-        //        {
-        //            WriteRouteToDB(monkey, route);
-
-        //            Console.ForegroundColor = ConsoleColor.White;
-        //            Console.WriteLine($"{WoodID}: End {WoodID}, {monkey.Name}");
-
-        //            return route;
-        //        }
-
-        //        Tree nextTree = nearestTrees.First();
-        //        route.Add(nextTree);
-        //        monkey.Tree = nextTree;
-        //    }
-        //    while (true);
-        //}
-
-        private double CalculateDistance(Tree tree1, Tree tree2)
+        private double CalculateDistance(Tree tree1, Tree tree2) // NIET
         {
             return Math.Sqrt(Math.Pow(tree1.X - tree2.X, 2) + Math.Pow(tree1.Y - tree2.Y, 2));
         }
 
 
-        public List<Tree> FindNearestTree(int x, int y, int n)
+        public List<Tree> FindNearestTree(int x, int y, int n) // NIET
         {
             SortedList<double, List<Tree>> nn = new SortedList<double, List<Tree>>();
 
@@ -234,7 +151,7 @@ namespace Escape.BL.Models
             return (List<Tree>)ListFromSortedList(nn).Take(n).ToList();
         }
 
-        private List<Tree> ListFromSortedList(SortedList<double, List<Tree>> nn)
+        private List<Tree> ListFromSortedList(SortedList<double, List<Tree>> nn) // NIET
         {
             List<Tree> list = new List<Tree>();
             foreach (List<Tree> l in nn.Values)
@@ -247,11 +164,23 @@ namespace Escape.BL.Models
         private (int, int) FindCell(int x, int y)
         {
             if (!GridDataSet.XYBoundary.WithinBounds(x, y))
+            {
                 throw new ArgumentException();
+
+            }
+
             int i = (int)((x - GridDataSet.XYBoundary.Xmin) / GridDataSet.Delta);
             int j = (int)((y - GridDataSet.XYBoundary.Ymin) / GridDataSet.Delta);
-            if (i == GridDataSet.NX) i--;
-            if (j == GridDataSet.NY) j--;
+
+            if (i == GridDataSet.NX)
+            {
+                i--;
+            }
+            if (j == GridDataSet.NY)
+            {
+                j--;
+            }
+
             return (i, j);
         }
 
@@ -259,11 +188,18 @@ namespace Escape.BL.Models
         {
             foreach (Tree tree in GridDataSet.GridData[i][j])
             {
+                // foreach??
                 double dSquare = Math.Pow(tree.X - x, 2) + Math.Pow(tree.Y - y, 2);
                 if ((nn.Count < n) || (dSquare < nn.Keys[nn.Count - 1]))
                 {
-                    if (nn.ContainsKey(dSquare)) nn[dSquare].Add(tree);
-                    else nn.Add(dSquare, new List<Tree>() { tree });
+                    if (nn.ContainsKey(dSquare))
+                    {
+                        nn[dSquare].Add(tree);
+                    }
+                    else
+                    {
+                        nn.Add(dSquare, new List<Tree>() { tree });
+                    }
                 }
             }
         }
@@ -273,27 +209,54 @@ namespace Escape.BL.Models
             for (int gx = i - ring; gx <= i + ring; gx++)
             {
                 int gy = j - ring;
-                if (IsValidCell(gx, gy)) ProcessCell(nn, i, j, x, y, n);
+                if (IsValidCell(gx, gy))
+                {
+                    ProcessCell(nn, i, j, x, y, n);
+                }
 
                 gy = j + ring;
-                if (IsValidCell(gx, gy)) ProcessCell(nn, i, j, x, y, n);
+                if (IsValidCell(gx, gy))
+                {
+                    ProcessCell(nn, i, j, x, y, n);
+                }
             }
             for (int gy = j - ring; gy <= j + ring; gy++)
             {
                 int gx = i - ring;
-                if (IsValidCell(gx, gy)) ProcessCell(nn, i, j, x, y, n);
+                if (IsValidCell(gx, gy))
+                {
+                    ProcessCell(nn, i, j, x, y, n);
+                }
 
                 gx = i + ring;
-                if (IsValidCell(gx, gy)) ProcessCell(nn, i, j, x, y, n);
+                if (IsValidCell(gx, gy))
+                {
+                    ProcessCell(nn, i, j, x, y, n);
+                }
             }
         }
 
         private bool IsValidCell(int i, int j)
         {
-            if ((i < 0) || (i >= GridDataSet.NX)) return false;
-            if ((j < 0) || (j >= GridDataSet.NY)) return false;
+            if ((i < 0) || (i >= GridDataSet.NX))
+            {
+                return false;
+            }
+            if ((j < 0) || (j >= GridDataSet.NY))
+            {
+                return false;
+            }
+
             return true;
         }
+
+
+
+
+
+
+
+
 
         public void WriteWoodToDB()
         {
@@ -474,6 +437,5 @@ namespace Escape.BL.Models
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{WoodID}: Writing logs in database for monkeys - End");
         }
-
     }
 }

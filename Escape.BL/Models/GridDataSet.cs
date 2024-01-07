@@ -18,13 +18,19 @@ namespace Escape.BL.Models
             for (int i = 0; i < NX; i++)
             {
                 GridData[i] = new List<Tree>[NY];
-                for (int j = 0; j < NY; j++) GridData[i][j] = new List<Tree>();
+                for (int j = 0; j < NY; j++)
+                {
+                    GridData[i][j] = new List<Tree>();
+                }
             }
         }
 
         public GridDataSet(XYBoundary xYBoundary, double delta, List<Tree> gridData) : this(xYBoundary, delta)
         {
-            foreach (Tree tree in gridData) AddXY(tree);
+            foreach (Tree tree in gridData)
+            {
+                AddXY(tree);
+            }
         }
 
         public double Delta { get; set; }
@@ -33,14 +39,25 @@ namespace Escape.BL.Models
         public int NX { get; set; }
         public int NY { get; set; }
 
-        public void AddXY(Tree tree)
+        public void AddXY(Tree tree) // ANDERS
         {
             if ((tree.X < XYBoundary.Xmin) || (tree.X > XYBoundary.Xmax) || (tree.Y < XYBoundary.Ymin) || (tree.Y > XYBoundary.Ymax))
+            {
                 throw new ArgumentException();
+            }
+                
             int i = (int)((tree.X - XYBoundary.Xmin) / Delta);
             int j = (int)((tree.Y - XYBoundary.Ymin) / Delta);
-            if (i == NX) i--;
-            if (j == NY) j--;
+
+            if (i == NX)
+            {
+                i--;
+            }
+            if (j == NY)
+            {
+                j--;
+            }
+
             GridData[i][j].Add(tree);
         }
     }

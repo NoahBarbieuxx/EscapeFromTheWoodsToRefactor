@@ -5,9 +5,9 @@ using System.Reflection.Emit;
 
 namespace Escape.UI
 {
-    internal class Program
+    public class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -39,21 +39,11 @@ namespace Escape.UI
             w3.PlaceMonkey("Kobe", IDgenerator.GetMonkeyID());
             w3.PlaceMonkey("Kendra", IDgenerator.GetMonkeyID());
 
-            //Thread t1 = new Thread(() => ProcessWood(w1));
-            //Thread t2 = new Thread(() => ProcessWood(w2));
-            //Thread t3 = new Thread(() => ProcessWood(w3));
+            Task t1 = Task.Run(() => ProcessWood(w1));
+            Task t2 = Task.Run(() => ProcessWood(w2));
+            Task t3 = Task.Run(() => ProcessWood(w3));
 
-            //t1.Start();
-            //t2.Start();
-            //t3.Start();
-
-            //t1.Join();
-            //t2.Join();
-            //t3.Join();
-
-            ProcessWood(w1);
-            ProcessWood(w2);
-            ProcessWood(w3);
+            await Task.WhenAll(t1, t2, t3);
 
             stopwatch.Stop();
             Console.WriteLine("Time elapsed: {0}", stopwatch.Elapsed);

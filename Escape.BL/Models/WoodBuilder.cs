@@ -30,7 +30,6 @@ namespace Escape.BL.Models
 
             double delta = Math.Min(deltaX, deltaY);
 
-
             GridDataSet gridDataSet = new GridDataSet(xYBoundary, delta);
 
             Wood wood = new Wood(woodId, trees, map, path, db, gridDataSet);
