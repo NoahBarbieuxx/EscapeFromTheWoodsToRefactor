@@ -1,0 +1,12 @@
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\bin\Debug\net6.0\Escape.DL.deps.json
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\bin\Debug\net6.0\Escape.DL.dll
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\bin\Debug\net6.0\Escape.DL.pdb
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.csproj.AssemblyReference.cache
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.AssemblyInfoInputs.cache
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.AssemblyInfo.cs
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.csproj.CoreCompileInputs.cache
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.dll
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\refint\Escape.DL.dll
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\Escape.DL.pdb
+C:\Users\barbi\Documents\hogent\sem3\6 - Solutions\EscapeFromTheWoodsToRefactor\Escape.DL\obj\Debug\net6.0\ref\Escape.DL.dll
