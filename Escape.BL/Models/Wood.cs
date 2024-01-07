@@ -1,20 +1,14 @@
 ﻿using Escape.DL.Models;
 using Escape.DL.Repositories;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Escape.BL.Models
 {
     public class Wood
     {
-        public Wood(int woodID, List<Tree> trees, Map map, string path, MongoDBrepository db, GridDataSet gridDataSet)
+        public Wood(int woodID, List<Tree> trees, Map map, string path, MongoDBrepository db, Grid grid)
         {
             WoodID = woodID;
             Trees = trees;
@@ -22,7 +16,7 @@ namespace Escape.BL.Models
             Map = map;
             _path = path;
             Db = db;
-            GridDataSet = gridDataSet;
+            Grid = grid;
         }
 
         public int WoodID { get; set; }
@@ -31,7 +25,7 @@ namespace Escape.BL.Models
         public Map Map { get; set; }
         public string _path { get; set; }
         public MongoDBrepository Db { get; set; }
-        public GridDataSet GridDataSet { get; set; }
+        public Grid Grid { get; set; }
 
         public void PlaceMonkey(string monkeyName, int monkeyID)
         {
@@ -52,19 +46,20 @@ namespace Escape.BL.Models
 
         public async Task EscapeAsync()
         {
-            Dictionary<int, List<Tree>> escapeRoutes = new Dictionary<int, List<Tree>>();
+            Dictionary<Monkey, List<Tree>> escapeRoutes = new Dictionary<Monkey, List<Tree>>();
             List<Task<List<Tree>>> escapeTasks = new List<Task<List<Tree>>>();
 
             foreach (Monkey monkey in Monkeys)
             {
                 escapeTasks.Add(EscapeMonkeyAsync(monkey));
+                //escapeTasks.Add(EscapeMonkeyAsync(monkey, Grid));
             }
 
             await Task.WhenAll(escapeTasks);
 
             for (int i = 0; i < Monkeys.Count; i++)
             {
-                escapeRoutes.Add(Monkeys[i].MonkeyID, escapeTasks[i].Result);
+                escapeRoutes.Add(Monkeys[i], escapeTasks[i].Result);
             }
 
             await WriteEscaperoutesToBitmapAsync(escapeRoutes.Values.ToList());
@@ -127,151 +122,55 @@ namespace Escape.BL.Models
             while (true);
         }
 
-        private double CalculateDistance(Tree tree1, Tree tree2) // NIET
-        {
-            return Math.Sqrt(Math.Pow(tree1.X - tree2.X, 2) + Math.Pow(tree1.Y - tree2.Y, 2));
-        }
+        //public async Task<List<Tree>> EscapeMonkeyAsync(Monkey monkey, Grid grid)
+        //{
+        //    Console.ForegroundColor = ConsoleColor.White;
+        //    Console.WriteLine($"{WoodID}: Start {WoodID}, {monkey.Name}");
 
+        //    Dictionary<int, bool> visited = Trees.ToDictionary(x => x.TreeID, x => false);
 
-        public List<Tree> FindNearestTree(int x, int y, int n) // NIET
-        {
-            SortedList<double, List<Tree>> nn = new SortedList<double, List<Tree>>();
+        //    List<Tree> route = new List<Tree> { monkey.Tree };
+        //    do
+        //    {
+        //        visited[monkey.Tree.TreeID] = true;
+        //        List<Tree> neighbors = grid.FindNearestTree(monkey, 10)
+        //                            .Where(tree => !visited[tree.TreeID] && !tree.HasMonkey)
+        //                            .ToList();
 
-            (int i, int j) = FindCell(x, y);
+        //        double distanceToBorder = new List<double>
+        //        {
+        //            Map.Ymax - monkey.Tree.Y,
+        //            Map.Xmax - monkey.Tree.X,
+        //            monkey.Tree.Y - Map.Ymin,
+        //            monkey.Tree.X - Map.Xmin
+        //        }.Min();
 
-            ProcessCell(nn, i, j, x, y, n);
+        //        if (neighbors.Count == 0 || distanceToBorder < CalculateDistance(neighbors.First(), monkey.Tree))
+        //        {
+        //            await WriteRouteToDBAsync(monkey, route);
 
-            int ring = 0;
+        //            Console.ForegroundColor = ConsoleColor.White;
+        //            Console.WriteLine($"{WoodID}: End {WoodID}, {monkey.Name}");
 
-            while (nn.Count < n)
-            {
-                ring++;
-                ProcessRing(i, j, ring, nn, x, y, n);
-            }
+        //            return route;
+        //        }
 
-            int n_rings = 1;
-            if (ring > 0) n_rings = (int)Math.Ceiling(Math.Sqrt(2) * ring) - ring;
-            for (int extraRings = 1; extraRings <= n_rings; extraRings++)
-            {
-                ProcessRing(i, j, ring + extraRings, nn, x, y, n);
-            }
-
-            return (List<Tree>)ListFromSortedList(nn).Take(n).ToList();
-        }
-
-        private List<Tree> ListFromSortedList(SortedList<double, List<Tree>> nn) // NIET
-        {
-            List<Tree> list = new List<Tree>();
-            foreach (List<Tree> l in nn.Values)
-            {
-                foreach (Tree v in l) list.Add(v);
-            }
-            return list;
-        }
-
-        private (int, int) FindCell(int x, int y)
-        {
-            if (!GridDataSet.XYBoundary.WithinBounds(x, y))
-            {
-                throw new ArgumentException();
-
-            }
-
-            int i = (int)((x - GridDataSet.XYBoundary.Xmin) / GridDataSet.Delta);
-            int j = (int)((y - GridDataSet.XYBoundary.Ymin) / GridDataSet.Delta);
-
-            if (i == GridDataSet.NX)
-            {
-                i--;
-            }
-            if (j == GridDataSet.NY)
-            {
-                j--;
-            }
-
-            return (i, j);
-        }
-
-        private void ProcessCell(SortedList<double, List<Tree>> nn, int i, int j, int x, int y, int n)
-        {
-            foreach (Tree tree in GridDataSet.GridData[i][j])
-            {
-                // foreach??
-                double dSquare = Math.Pow(tree.X - x, 2) + Math.Pow(tree.Y - y, 2);
-                if ((nn.Count < n) || (dSquare < nn.Keys[nn.Count - 1]))
-                {
-                    if (nn.ContainsKey(dSquare))
-                    {
-                        nn[dSquare].Add(tree);
-                    }
-                    else
-                    {
-                        nn.Add(dSquare, new List<Tree>() { tree });
-                    }
-                }
-            }
-        }
-
-        private void ProcessRing(int i, int j, int ring, SortedList<double, List<Tree>> nn, int x, int y, int n)
-        {
-            for (int gx = i - ring; gx <= i + ring; gx++)
-            {
-                int gy = j - ring;
-                if (IsValidCell(gx, gy))
-                {
-                    ProcessCell(nn, i, j, x, y, n);
-                }
-
-                gy = j + ring;
-                if (IsValidCell(gx, gy))
-                {
-                    ProcessCell(nn, i, j, x, y, n);
-                }
-            }
-            for (int gy = j - ring; gy <= j + ring; gy++)
-            {
-                int gx = i - ring;
-                if (IsValidCell(gx, gy))
-                {
-                    ProcessCell(nn, i, j, x, y, n);
-                }
-
-                gx = i + ring;
-                if (IsValidCell(gx, gy))
-                {
-                    ProcessCell(nn, i, j, x, y, n);
-                }
-            }
-        }
-
-        private bool IsValidCell(int i, int j)
-        {
-            if ((i < 0) || (i >= GridDataSet.NX))
-            {
-                return false;
-            }
-            if ((j < 0) || (j >= GridDataSet.NY))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-
-
-
-
-
-
-
+        //        Tree nextTree = neighbors.First();
+        //        route.Add(nextTree);
+        //        monkey.Tree = nextTree;
+        //    }
+        //    while (true);
+        //}
+        //private double CalculateDistance(Tree tree1, Tree tree2)
+        //{
+        //    return Math.Sqrt(Math.Pow(tree1.X - tree2.X, 2) + Math.Pow(tree1.Y - tree2.Y, 2));
+        //}
 
         public async Task WriteWoodToDBAsync()
         {
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{WoodID}: Writing wood in database for WoodID: {WoodID} - Start");
 
-            List<Task> tasks = new List<Task>();
             List<WoodRecords> records = new List<WoodRecords>();
             foreach (Tree tree in Trees)
             {
@@ -369,34 +268,41 @@ namespace Escape.BL.Models
                     }
                     bitmap.Save(memoryStream, ImageFormat.Jpeg);
                 }
-                 File.WriteAllBytes(Path.Combine(_path, WoodID.ToString() + "_escapeRoutes.jpg"), memoryStream.ToArray());
+                await Task.Run(() =>
+                {
+                    string filePath = Path.Combine(_path, WoodID.ToString() + "_escapeRoutes.jpg");
+                    File.WriteAllBytes(filePath, memoryStream.ToArray());
+                });
             }
 
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{WoodID}: Writing bitmap routes for WoodID: {WoodID} - End");
         }
 
-
-        public async Task WriteMonkeyLocationsToLogAsync(Dictionary<int, List<Tree>> escapeRoutes)
+        public async Task WriteMonkeyLocationsToLogAsync(Dictionary<Monkey, List<Tree>> escapeRoutes)
         {
             string logFolderPath = Path.Combine("C:\\Users\\barbi\\Documents\\hogent\\sem3\\6 - Solutions\\EscapeFromTheWoodsToRefactor\\Escape.Logs");
             string logFilePath = Path.Combine(logFolderPath, WoodID.ToString() + "_MonkeyLocationsLog.txt");
 
+            Dictionary<Monkey, List<Tree>> sortedEscapeRoutes = escapeRoutes
+                .OrderBy(entry => entry.Key.Name)
+                .ToDictionary(entry => entry.Key, entry => entry.Value);
+
             using (StreamWriter writer = new StreamWriter(logFilePath))
             {
-                int maxLength = escapeRoutes.Max(r => r.Value.Count);
+                int maxLength = sortedEscapeRoutes.Max(r => r.Value.Count);
                 int j = 0;
                 bool continueLoop = true;
 
                 while (continueLoop)
                 {
-
-                    foreach (var route in escapeRoutes)
+                    foreach (var route in sortedEscapeRoutes)
                     {
+
                         if (j < route.Value.Count)
                         {
                             Tree tree = route.Value[j];
-                            Monkey monkey = Monkeys.Single(m => m.MonkeyID == route.Key);
+                            Monkey monkey = route.Key;
 
                             monkey.Tree = tree;
 
@@ -413,7 +319,7 @@ namespace Escape.BL.Models
             }
         }
 
-        public async Task WriteMonkeyLocationsToDBAsync(Dictionary<int, List<Tree>> escapeRoutes)
+        public async Task WriteMonkeyLocationsToDBAsync(Dictionary<Monkey, List<Tree>> escapeRoutes)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"{WoodID}: Writing logs in database for monkeys - Start");
@@ -422,7 +328,8 @@ namespace Escape.BL.Models
 
             foreach (var route in escapeRoutes)
             {
-                int monkeyId = route.Key;
+                int monkeyId = route.Key.MonkeyID;
+
 
                 if (Monkeys.Any(m => m.MonkeyID == monkeyId))
                 {

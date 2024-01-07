@@ -1,10 +1,5 @@
 ﻿using Escape.DL.Models;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Escape.DL.Repositories
 {
@@ -21,22 +16,22 @@ namespace Escape.DL.Repositories
             _database = _dbClient.GetDatabase("EscapeFromTheWoods");
         }
 
-        public Task WriteWoodRecords(List<WoodRecords> data)
+        public Task WriteWoodRecords(List<WoodRecords> woodRecords)
         {
             var collection = _database.GetCollection<WoodRecords>("WoodRecords");
-            return collection.InsertManyAsync(data);
+            return collection.InsertManyAsync(woodRecords);
         }
 
-        public Task WriteMonkeyRecords(List<MonkeyRecords> data)
+        public Task WriteMonkeyRecords(List<MonkeyRecords> monkeyRecords)
         {
             var collection = _database.GetCollection<MonkeyRecords>("MonkeyRecords");
-            return collection.InsertManyAsync(data);
+            return collection.InsertManyAsync(monkeyRecords);
         }
 
-        public Task WriteMonkeyLogs(List<Logs> data)
+        public Task WriteMonkeyLogs(List<Logs> logs)
         {
             var collection = _database.GetCollection<Logs>("Logs");
-            return collection.InsertManyAsync(data);
+            return collection.InsertManyAsync(logs);
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Escape.BL.Models
+﻿namespace Escape.BL.Models
 {
     public class GridDataSet
     {
@@ -39,7 +33,7 @@ namespace Escape.BL.Models
         public int NX { get; set; }
         public int NY { get; set; }
 
-        public void AddXY(Tree tree) // ANDERS
+        public void AddXY(Tree tree)
         {
             if ((tree.X < XYBoundary.Xmin) || (tree.X > XYBoundary.Xmax) || (tree.Y < XYBoundary.Ymin) || (tree.Y > XYBoundary.Ymax))
             {

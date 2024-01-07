@@ -1,10 +1,4 @@
 ﻿using Escape.DL.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Escape.BL.Models
 {
@@ -31,8 +25,9 @@ namespace Escape.BL.Models
             double delta = Math.Min(deltaX, deltaY);
 
             GridDataSet gridDataSet = new GridDataSet(xYBoundary, delta);
+            Grid grid = new Grid(gridDataSet);
 
-            Wood wood = new Wood(woodId, trees, map, path, db, gridDataSet);
+            Wood wood = new Wood(woodId, trees, map, path, db, grid);
             return wood;
         }
 
