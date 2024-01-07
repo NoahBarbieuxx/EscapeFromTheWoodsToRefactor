@@ -21,22 +21,22 @@ namespace Escape.DL.Repositories
             _database = _dbClient.GetDatabase("EscapeFromTheWoods");
         }
 
-        public void WriteWoodRecords(List<WoodRecords> data)
+        public Task WriteWoodRecords(List<WoodRecords> data)
         {
             var collection = _database.GetCollection<WoodRecords>("WoodRecords");
-            collection.InsertMany(data);
+            return collection.InsertManyAsync(data);
         }
 
-        public void WriteMonkeyRecords(List<MonkeyRecords> data)
+        public Task WriteMonkeyRecords(List<MonkeyRecords> data)
         {
             var collection = _database.GetCollection<MonkeyRecords>("MonkeyRecords");
-            collection.InsertMany(data);
+            return collection.InsertManyAsync(data);
         }
 
-        public void WriteMonkeyLogs(List<Logs> data)
+        public Task WriteMonkeyLogs(List<Logs> data)
         {
             var collection = _database.GetCollection<Logs>("Logs");
-            collection.InsertMany(data);
+            return collection.InsertManyAsync(data);
         }
     }
 }

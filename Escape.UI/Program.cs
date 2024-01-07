@@ -50,10 +50,10 @@ namespace Escape.UI
             Console.WriteLine("end");
         }
 
-        static void ProcessWood(Wood wood)
+        static async Task ProcessWood(Wood wood)
         {
-            wood.WriteWoodToDB();
-            wood.Escape();
+            await wood.WriteWoodToDBAsync();
+            await wood.EscapeAsync();
         }
     }
 }
